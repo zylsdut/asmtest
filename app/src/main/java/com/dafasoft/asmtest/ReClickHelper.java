@@ -4,11 +4,10 @@ public class ReClickHelper {
     private static long currentTime;
 
     public static boolean clickEnable() {
-        return !clickEnable(500);
+        return !clickEnable(2000);
     }
 
     public static boolean clickEnable(long interval) {
-        System.out.println("-------------------------clickEnable");
         boolean clickEnable = true;
         if (Math.abs(System.currentTimeMillis() - currentTime) < interval) {
             clickEnable = false;
@@ -24,8 +23,8 @@ public class ReClickHelper {
 
 
     public static void clickEnable500() {
-        boolean enable = clickEnable();
-        if (!enable) {
+        boolean clickable = clickEnable();
+        if (clickable) {
             return;
         }
     }
