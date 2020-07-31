@@ -1,5 +1,6 @@
 package com.llew.bytecode.fix.transform;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -22,6 +23,14 @@ public class AsmMethodVisitor extends AdviceAdapter {
     public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
         System.out.println(String.format("visitInvokeDynamicInsn = %s    %s", name, desc));
         super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    }
+
+
+
+    @Override
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        System.out.println(String.format("visitAnnotation = %s  %b", desc, desc));
+        return super.visitAnnotation(desc, visible);
     }
 
     @Override

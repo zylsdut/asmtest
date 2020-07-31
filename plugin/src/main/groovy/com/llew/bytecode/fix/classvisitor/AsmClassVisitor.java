@@ -21,12 +21,6 @@ public class AsmClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings) {
         System.out.println("==== directoryInput file name == "+ "visitMethod");
         MethodVisitor mv = cv.visitMethod(i,s,s1,s2,strings);
-        System.out.println(String.format("------------------------params = %d   %s  %s %s", i, s, s1, s2));
-        if (strings != null && strings.length > 0) {
-            for (String single : strings) {
-                System.out.println("-----------------------------single = " + single);
-            }
-        }
         AsmMethodVisitor asmClassVisitor = new AsmMethodVisitor(Opcodes.ASM5, mv, i, s, s1);
         return asmClassVisitor;
     }

@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     private long lastTime;
@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    /*@Override
+    @Override
     public void onClick(View v) {
         Log.d("zyl", "距离上次点击 =" + (System.currentTimeMillis() - lastTime));
         Log.d("zyl", "onCLick");
         lastTime = System.currentTimeMillis();
-    }*/
+    }
 }
