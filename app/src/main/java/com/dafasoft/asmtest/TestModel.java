@@ -17,6 +17,6 @@ public class TestModel {
 
 
     public interface TestListener {
-        void onClick(View view);
+        void onClick(View v);
     }
 }

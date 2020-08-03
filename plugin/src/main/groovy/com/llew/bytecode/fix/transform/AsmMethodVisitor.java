@@ -12,30 +12,52 @@ public class AsmMethodVisitor extends AdviceAdapter {
 
     private String methodName;
     private String methodDes;
+    private String classInfo;
 
-    public AsmMethodVisitor(int i, MethodVisitor methodVisitor, int i1, String s, String s1) {
+    private static int count = 0;
+
+    public AsmMethodVisitor(int i, MethodVisitor methodVisitor, int i1, String s, String s1, String classInfo) {
         super(i, methodVisitor, i1, s, s1);
         methodName = s;
         methodDes = s1;
+        this.classInfo = classInfo;
+        count++;
+        System.out.println("---------------------count = " + count);
     }
 
     @Override
     public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
-        System.out.println(String.format("visitInvokeDynamicInsn = %s    %s", name, desc));
+        System.out.println(String.format("----------------visitInvokeDynamicInsn  = %s    %s", name, desc));
         super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    }
+
+    @Override
+    public void invokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs) {
+        System.out.println(String.format("----------------invokeDynamic  = %s    %s", name, desc));
+        super.invokeDynamic(name, desc, bsm, bsmArgs);
+    }
+
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+        super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
 
 
     @Override
+    public AnnotationVisitor visitAnnotationDefault() {
+        return super.visitAnnotationDefault();
+    }
+
+    @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        System.out.println(String.format("visitAnnotation = %s  %b", desc, desc));
+        System.out.println("----------------- desc = " + desc);
         return super.visitAnnotation(desc, visible);
     }
 
     @Override
     protected void onMethodEnter() {
-        System.out.println(String.format("methodName = %s methodDesc = %s", methodName, methodDes));
+        System.out.println(String.format("onMethodEnter----------- methodName = %s    methodDes = %s   classInfo = %s", methodName, methodDes, classInfo));
         if ("onClick".equals(methodName)&&"(Landroid/view/View;)V".equals(methodDes)){
           //将引用变量推送到栈顶
             mv.visitVarInsn(ALOAD,1);

@@ -2,11 +2,12 @@ package com.dafasoft.asmtest;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, TestModel.TestListener {
 
 
     private long lastTime;
@@ -19,22 +20,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void asdf() {
+        TestModel model = new TestModel();
         findViewById(R.id.test).setOnClickListener(v -> {
-            Log.d("zyl", "onCLick");
+            this.startActivity(new Intent());
         });
 
-        TestModel model = new TestModel();
-        model.setListener(view -> {
-
+        findViewById(R.id.test).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
         });
     }
 
-
-
     @Override
     public void onClick(View v) {
-        Log.d("zyl", "距离上次点击 =" + (System.currentTimeMillis() - lastTime));
-        Log.d("zyl", "onCLick");
-        lastTime = System.currentTimeMillis();
+
+    }
+
+    private void setData() {
+        findViewById(R.id.test).setOnClickListener(v4 -> {
+        });
     }
 }
