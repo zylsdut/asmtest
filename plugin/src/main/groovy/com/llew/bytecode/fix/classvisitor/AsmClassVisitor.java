@@ -54,7 +54,7 @@ public class AsmClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings) {
         System.out.println("--------------------MethodVisitor = " + Arrays.toString(strings));
         MethodVisitor mv = cv.visitMethod(i,s,s1,s2,strings);
-        AsmMethodVisitor asmClassVisitor = new AsmMethodVisitor(Opcodes.ASM5, mv, i, s, s1, toString());
+        AsmMethodVisitor asmClassVisitor = new AsmMethodVisitor(Opcodes.ASM5, mv, i, s, s1, mInterfaces);
         return asmClassVisitor;
     }
 

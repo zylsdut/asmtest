@@ -1,5 +1,6 @@
 package com.llew.bytecode.fix.transform;
 
+import org.apache.http.util.TextUtils;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
@@ -8,33 +9,42 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.plaf.TextUI;
+
 public class AsmMethodVisitor extends AdviceAdapter {
 
     private String methodName;
     private String methodDes;
-    private String classInfo;
-
+    private String[] classInterfaces; // method owmer class interface
+    private static List<String> lambdaListenerList = new ArrayList<>();
     private static int count = 0;
 
-    public AsmMethodVisitor(int i, MethodVisitor methodVisitor, int i1, String s, String s1, String classInfo) {
+    public AsmMethodVisitor(int i, MethodVisitor methodVisitor, int i1, String s, String s1, String[] interfaces) {
         super(i, methodVisitor, i1, s, s1);
         methodName = s;
         methodDes = s1;
-        this.classInfo = classInfo;
+        this.classInterfaces = interfaces;
         count++;
         System.out.println("---------------------count = " + count);
     }
 
     @Override
     public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
-        System.out.println(String.format("----------------visitInvokeDynamicInsn  = %s    %s", name, desc));
-        super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-    }
-
-    @Override
-    public void invokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs) {
-        System.out.println(String.format("----------------invokeDynamic  = %s    %s", name, desc));
-        super.invokeDynamic(name, desc, bsm, bsmArgs);
+        Object[] restArgs = bsmArgs;
+        if (restArgs == null || restArgs.length < 2 || !(restArgs[1] instanceof Handle)) {
+            super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+        } else {
+            Handle handle = (Handle) restArgs[1];
+            if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(desc) && !TextUtils.isEmpty(handle.getName()) && !TextUtils.isEmpty(handle.getDesc())) {
+                if ("onClick".equals(name) && desc.contains("Landroid/view/View$OnClickListener")) {
+                    lambdaListenerList.add(handle.getName());
+                }
+            }
+            super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+        }
     }
 
     @Override
@@ -42,26 +52,30 @@ public class AsmMethodVisitor extends AdviceAdapter {
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
-
-
-    @Override
-    public AnnotationVisitor visitAnnotationDefault() {
-        return super.visitAnnotationDefault();
-    }
-
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        System.out.println("----------------- desc = " + desc);
+        System.out.println("visitAnnotation----------------- desc = " + desc);
         return super.visitAnnotation(desc, visible);
+    }
+
+
+    @Override
+    public void visitCode() {
+        super.visitCode();
     }
 
     @Override
     protected void onMethodEnter() {
-        System.out.println(String.format("onMethodEnter----------- methodName = %s    methodDes = %s   classInfo = %s", methodName, methodDes, classInfo));
-        if ("onClick".equals(methodName)&&"(Landroid/view/View;)V".equals(methodDes)){
-          //将引用变量推送到栈顶
+        boolean isClickMethod;
+        if (methodName.contains("lambda")) {
+            isClickMethod = isLambdaClickFunction();
+        } else {
+            isClickMethod = isCommonClickFunction();
+        }
+        if (isClickMethod) {
+            //将引用变量推送到栈顶
             mv.visitVarInsn(ALOAD,1);
-         //添加方法
+            //添加方法
             mv.visitMethodInsn(Opcodes.INVOKESTATIC,"com/dafasoft/asmtest/ReClickHelper","clickEnable","()Z",false);
             int clickable = newLocal(Type.BOOLEAN_TYPE);
             mv.visitVarInsn(LSTORE, clickable);
@@ -71,5 +85,41 @@ public class AsmMethodVisitor extends AdviceAdapter {
             mv.visitInsn(RETURN);
             mv.visitLabel(l2);
         }
+    }
+
+    private boolean isCommonClickFunction() {
+        if (!"onClick".equals(methodName)) {
+            return false;
+        }
+        if (!"(Landroid/view/View;)V".equals(methodDes)) {
+            return false;
+        }
+        if (classInterfaces == null || classInterfaces.length <= 0) {
+            return false;
+        }
+        for (String str : classInterfaces) {
+            if (str.equals("android/view/View$OnClickListener")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isLambdaClickFunction() {
+        int index = -1;
+        int size = lambdaListenerList.size();
+        if (size <= 0) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (lambdaListenerList.get(i).equals(methodName)) {
+                index = i;
+            }
+        }
+        if (index > -1) {
+            lambdaListenerList.remove(index);
+            return true;
+        }
+        return false;
     }
 }

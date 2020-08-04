@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, TestModel.TestListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     private long lastTime;
@@ -20,25 +20,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void asdf() {
-        TestModel model = new TestModel();
-        findViewById(R.id.test).setOnClickListener(v -> {
-            this.startActivity(new Intent());
+        findViewById(R.id.test1).setOnClickListener(v -> {
+            long current = System.currentTimeMillis();
+            long interval = current - lastTime;
+            Log.d("zyl", "test1 点击间隔 ： " + interval);
+            lastTime = current;
         });
 
-        findViewById(R.id.test).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.test2).setOnClickListener(v -> {
+            long current = System.currentTimeMillis();
+            long interval = current - lastTime;
+            Log.d("zyl", "test2 点击间隔 ： " + interval);
+            lastTime = current;
+        });
+
+        findViewById(R.id.test3).setOnClickListener(v -> {
+            long current = System.currentTimeMillis();
+            long interval = current - lastTime;
+            Log.d("zyl", "test3 点击间隔 ： " + interval);
+            lastTime = current;
+        });
+
+        /*findViewById(R.id.test2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                long current = System.currentTimeMillis();
+                long interval = current - lastTime;
+                Log.d("zyl", "test2 点击间隔 ： " + interval);
+                lastTime = current;
             }
         });
+        findViewById(R.id.test3).setOnClickListener(this);*/
     }
 
     @Override
     public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.test3:
+                long current = System.currentTimeMillis();
+                long interval = current - lastTime;
+                Log.d("zyl", "test3 点击间隔 ： " + interval);
+                lastTime = current;
+                break;
 
-    }
-
-    private void setData() {
-        findViewById(R.id.test).setOnClickListener(v4 -> {
-        });
+                default:
+                    break;
+        }
     }
 }
